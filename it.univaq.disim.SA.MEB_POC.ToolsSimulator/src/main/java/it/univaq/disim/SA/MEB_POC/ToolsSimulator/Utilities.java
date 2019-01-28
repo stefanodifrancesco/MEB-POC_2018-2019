@@ -1,6 +1,9 @@
 package it.univaq.disim.SA.MEB_POC.ToolsSimulator;
 
 import java.io.BufferedReader;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -159,9 +162,15 @@ public class Utilities {
 	public static List<String> import_Equips_From_File() {
 		List<String> Lista = new ArrayList<String>();
 
-		InputStream res = Main.class.getResourceAsStream("/EquipList.txt");
+		FileReader res = null;
+		try {
+			res = new FileReader(new File("src/main/resources/EquipList.txt"));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 
-		BufferedReader reader = new BufferedReader(new InputStreamReader(res));
+		BufferedReader reader = new BufferedReader(res);
 		String line = null;
 
 		try {
@@ -186,9 +195,14 @@ public class Utilities {
 	public static List<String> import_Recipes_From_File() {
 		List<String> Lista = new ArrayList<String>();
 
-		InputStream res = Main.class.getResourceAsStream("/RecipeList.txt");
-
-		BufferedReader reader = new BufferedReader(new InputStreamReader(res));
+		FileReader res = null;
+		try {
+			res = new FileReader(new File("src/main/resources/RecipeList.txt"));
+		} catch (FileNotFoundException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
+		BufferedReader reader = new BufferedReader(res);
 		String line = null;
 
 		try {

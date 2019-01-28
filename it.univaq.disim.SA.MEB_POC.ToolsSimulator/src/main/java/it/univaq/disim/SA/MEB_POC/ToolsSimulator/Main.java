@@ -7,7 +7,9 @@ import java.util.stream.Collectors;
 import org.apache.commons.lang3.time.StopWatch;
 
 public class Main {
+	
 	public static void main(String[] args) {
+		
 		StopWatch stopwatch = new StopWatch();
 
 		List<String> equipOIDs = Utilities.import_Equips_From_File();
@@ -16,7 +18,7 @@ public class Main {
 		Counter messageCounter = new Counter();
 		stopwatch.start();
 
-		System.out.println("Starting tools! It will take 30 seconds...");
+		System.out.println("Starting tools! It will take 50 seconds...");
 
 		for (int i = 0; i < equipOIDs.size(); i++) {
 
@@ -33,7 +35,7 @@ public class Main {
 			tool.start();
 
 			try {
-				Thread.sleep(30);
+				Thread.sleep(50);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
