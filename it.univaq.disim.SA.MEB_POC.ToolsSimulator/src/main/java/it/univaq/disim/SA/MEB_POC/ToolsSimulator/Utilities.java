@@ -69,13 +69,13 @@ public class Utilities {
 		Inserted inserted = new Inserted();
 		Deleted del = new Deleted();
 
-		/*if (new Random().nextInt(100) != 1) {
+		if (new Random().nextInt(100) != 1) {
 			inserted.setEquip_OID(equipOID);
 			del.setEquip_OID(equipOID);
 		} else {
 			inserted.setEquip_OID("");
 			del.setEquip_OID("");
-		}*/
+		}
 		inserted.setEquip_OID("");
 		del.setEquip_OID("");
 		
