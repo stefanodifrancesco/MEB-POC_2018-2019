@@ -15,8 +15,9 @@ Extract the archive and rename the folder *mysqlc*
 Open a shell in the extracted folder and run:
 
 ```
-> .\bin\mysqld --initialize
+> .\bin\mysqld --initialize-insecure
 ```
+We will set a password at the end. Now create the following directory tree:
 ```
 > mkdir my_cluster my_cluster\ndb_data my_cluster\mysqld_data my_cluster\conf my_cluster\mysqld_data\mysql my_cluster\mysqld_data\ndbinfo my_cluster\mysqld_data\performance_schema
 ```
@@ -83,6 +84,14 @@ With another command prompt you can see the status of the nodes with the followi
 Finally run the mysqld service with:
 ```
 > .\bin\mysqld --defaults-file=my_cluster\conf\my.cnf --console
+```
+Open the *mysql* shell running:
+```
+.\bin\mysql -u root --skip-password
+```
+Now assign a password to the **root**:
+```
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 ```
 
 ## Kafka (localhost)
