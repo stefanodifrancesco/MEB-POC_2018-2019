@@ -1,12 +1,13 @@
 package it.univaq.disim.SA.MEB_POC.ToolsSimulator.Models;
 
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
 import javax.xml.bind.annotation.XmlType;
 
 @XmlRootElement(name="InhibitEvent", namespace="http://www.w3.org/2001/XMLSchema-instance")
 @XmlType(propOrder = {"equip_OID", "recipe_OID", "step_OID", "hold_type", "hold_flag", "event_datetime"})
 public class Inserted {
-	
+
 	private String equip_OID;
 	
 	private String recipe_OID;
@@ -23,6 +24,7 @@ public class Inserted {
 		return equip_OID;
 	}
 
+	@XmlElement(name="equip_OID",required=true,nillable=true)
 	public void setEquip_OID(String Equip_OID) {
 		this.equip_OID = Equip_OID;
 	}
@@ -31,6 +33,7 @@ public class Inserted {
 		return recipe_OID;
 	}
 
+	@XmlElement
 	public void setRecipe_OID(String Recipe_OID) {
 		this.recipe_OID = Recipe_OID;
 	}
@@ -39,6 +42,7 @@ public class Inserted {
 		return step_OID;
 	}
 
+	@XmlElement
 	public void setStep_OID(String Step_OID) {
 		this.step_OID = Step_OID;
 	}
@@ -47,6 +51,7 @@ public class Inserted {
 		return hold_type;
 	}
 
+	@XmlElement
 	public void setHold_type(String Hold_type) {
 		this.hold_type = Hold_type;
 	}
@@ -55,6 +60,7 @@ public class Inserted {
 		return hold_flag;
 	}
 
+	@XmlElement
 	public void setHold_flag(String Hold_flag) {
 		this.hold_flag = Hold_flag;
 	}
@@ -63,7 +69,9 @@ public class Inserted {
 		return event_datetime;
 	}
 
+	@XmlElement
 	public void setEvent_datetime(String eventDatetime) {
 		this.event_datetime = eventDatetime;
 	}
 }
+
