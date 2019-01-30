@@ -69,13 +69,14 @@ public class Utilities {
 		Inserted inserted = new Inserted();
 		Deleted del = new Deleted();
 
-		/*if (new Random().nextInt(100) != 1) {
+		if (new Random().nextInt(100) != 1) {
 			inserted.setEquip_OID(equipOID);
 			del.setEquip_OID(equipOID);
 		} else {
 			inserted.setEquip_OID("");
 			del.setEquip_OID("");
-		}*/
+		}
+		
 		inserted.setEquip_OID("");
 		del.setEquip_OID("");
 		
@@ -142,16 +143,18 @@ public class Utilities {
 
 	public static String Inhibit_to_XML(InhibitEvent event) {
 		
-		try {
-
-			JAXBContext jaxbContext = JAXBContext.newInstance(InhibitEvent.class);
-			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-
-			StringWriter message = new StringWriter();
-			jaxbMarshaller.marshal(event, message);
-
-			return message.toString();
+		try {JAXBContext jaxbContext = JAXBContext.newInstance(InhibitEvent.class);
+		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+		     
+		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+		StringWriter sw = new StringWriter();
+		jaxbMarshaller.marshal(event, sw);
+		
+		String sw_modified = sw.toString().replaceAll("<Inserted>","<Inserted xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
+										  .replaceAll("<Deleted>", "<Inserted xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
+										  .replaceAll("<equip_OID xsi:nil=\"true\"/>","<equip_OID/>");
+		
+		return sw_modified;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -222,5 +225,108 @@ public class Utilities {
 		}
 
 		return Lista;
+	}
+	
+	public static List<String> Generate_Recipe(int n_digit, String dir, String nomefile) {
+		ArrayList<String> Lista_Recipe_OID = new ArrayList<>();
+		Generatore_OID Generatore_Recipe_OID = new Generatore_OID();
+
+		for (int i = 0; i < n_digit; i++) {
+			if (i > 0) {
+				String Recipe_OID_Generated = Generatore_Recipe_OID.Generate_Recipe_OID();
+				while (addIdNotDuplicated(Recipe_OID_Generated, Lista_Recipe_OID) == false) {
+					System.out.println("Duplicated");
+					Recipe_OID_Generated = Generatore_Recipe_OID.Generate_Recipe_OID();
+				}
+			} else {
+				Lista_Recipe_OID.add(Generatore_Recipe_OID.Generate_Recipe_OID());
+			}
+		}
+		writeList(Lista_Recipe_OID, dir, nomefile);
+		return Lista_Recipe_OID;
+	}
+	
+	public static void Generate_Equip(List<String> Lista_Recipe_OID, int n_Equip_OID, String dir, String nomefile) {
+		List<String> Lista_Equip_OID = new ArrayList<>();
+		Generatore_OID Generatore_Equip_OID = new Generatore_OID();
+
+		for (int i = 0; i < Lista_Recipe_OID.size(); i++) {
+			String Owner = Lista_Recipe_OID.get(i).substring(Lista_Recipe_OID.get(i).length() - 4);
+			for (int j = 0; j < n_Equip_OID; j++) {
+				Lista_Equip_OID.add(Generatore_Equip_OID.Generate_Equip_OID(Owner));
+			}
+		}
+		writeList(Lista_Equip_OID, dir, nomefile);
+	}
+	
+	public static boolean isDuplcated(String id, ArrayList<String> Lista) {
+		String Id_Owner = id.substring(id.length() - 4);
+		for (String Archivied_id : Lista) {
+			String Archivied_Id_Owner = Archivied_id.substring(Archivied_id.length() - 4);
+			if ((id.equals(Archivied_id)) || (Id_Owner.equals(Archivied_Id_Owner))) {
+				return true;
+			}
+		}
+		return false;
+	}
+	
+	public static boolean addIdNotDuplicated(String String_OID, ArrayList<String> Lista) {
+		for (int j = 0; j < Lista.size(); j++) {
+
+			System.out.println(String_OID.substring(String_OID.length() - 4) + " = "
+					+ Lista.get(j).substring(Lista.get(j).length() - 4));
+
+			if (String_OID.equals(Lista.get(j)) || String_OID.substring(String_OID.length() - 4)
+					.equals(Lista.get(j).substring(Lista.get(j).length() - 4))) {
+				return false;
+			} else {
+				Lista.add(String_OID);
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public static void writeFile(String directory, String filename) {
+		String path = filename;
+		boolean success = (new File(directory)).mkdir();
+
+		if (success) {
+			System.out.println("Ho creato: " + directory);
+		} else {
+			System.out.println("Impossibile creare: " + directory);
+		}
+
+		try {
+			File file = new File(directory + filename);
+			FileWriter fw = new FileWriter(file);
+			fw.flush();
+			fw.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	public static void appendStrToFile(String fileName, String str) {
+		try {
+			// Open given file in append mode.
+			BufferedWriter out = new BufferedWriter(new FileWriter(fileName, true));
+			out.write(str);
+			out.newLine();
+			out.close();
+		} catch (IOException e) {
+			e.printStackTrace();
+			System.out.println("exception occurred" + e);
+		}
+	}
+
+	public static void writeList(List<String> list_to_write, String dir, String nomefile) {
+		Generatore_OID gen_OID = new Generatore_OID();
+		writeFile(dir, nomefile);
+		list_to_write.forEach(item -> {
+			appendStrToFile(dir + nomefile, "'" + item + "','" + gen_OID.random_string(4, "ABCDEF0123456789") + "'");
+			appendStrToFile(dir + nomefile + "Test1.csv", item.substring(0, item.length() - 4));
+			appendStrToFile(dir + nomefile + "Test2.csv", item.substring(item.length() - 4));
+		});
 	}
 }
