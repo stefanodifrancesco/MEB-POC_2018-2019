@@ -12,7 +12,7 @@ Some introduction text, formatted in heading 2 style
 
 ## Instructions <a name="instructions"></a>
 
-#### MySQL Cluster (localhost) <a name="mysql"></a>
+### MySQL Cluster (localhost) <a name="mysql"></a>
 
 Please download the ZIP archive of MySql Cluster from one of the following links:
 
@@ -103,7 +103,7 @@ Now set a password for the **root**:
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 ```
 
-## Kafka (localhost) <a name="kafka"></a>
+### Kafka (localhost) <a name="kafka"></a>
 
 > NOTE: Following commands run on Windows. On unix systems you can use sh scripts in bin folder 
 
