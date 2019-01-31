@@ -87,9 +87,9 @@ Finally run the mysqld service with:
 ```
 Open the *mysql* shell running:
 ```
-.\bin\mysql -u root --skip-password
+.\bin\mysql -u root --skip-password --port=5000
 ```
-Now assign a password to the **root**:
+Now set a password for the **root**:
 ```
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 ```
