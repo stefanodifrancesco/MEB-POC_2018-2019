@@ -230,13 +230,13 @@ public class Utilities {
 	}
 	
 	public static List<String> Generate_Recipe(int n_digit, String dir, String nomefile) {
-		ArrayList<String> Lista_Recipe_OID = new ArrayList<>();
+		List<String> Lista_Recipe_OID = new ArrayList<>();
 		Generatore_OID Generatore_Recipe_OID = new Generatore_OID();
 
 		for (int i = 0; i < n_digit; i++) {
 			if (i > 0) {
 				String Recipe_OID_Generated = Generatore_Recipe_OID.Generate_Recipe_OID();
-				while (addIdNotDuplicated(Recipe_OID_Generated, Lista_Recipe_OID) == false) {
+				while (addIdNotDuplicated(Recipe_OID_Generated, Lista_Recipe_OID,Recipe_OID_Generated.length()-4,Recipe_OID_Generated.length()) == false) {
 					System.out.println("Duplicated");
 					Recipe_OID_Generated = Generatore_Recipe_OID.Generate_Recipe_OID();
 				}
@@ -247,7 +247,7 @@ public class Utilities {
 		writeList(Lista_Recipe_OID, dir, nomefile);
 		return Lista_Recipe_OID;
 	}
-	
+
 	public static void Generate_Equip(List<String> Lista_Recipe_OID, int n_Equip_OID, String dir, String nomefile) {
 		List<String> Lista_Equip_OID = new ArrayList<>();
 		Generatore_OID Generatore_Equip_OID = new Generatore_OID();
@@ -255,6 +255,11 @@ public class Utilities {
 		for (int i = 0; i < Lista_Recipe_OID.size(); i++) {
 			String Owner = Lista_Recipe_OID.get(i).substring(Lista_Recipe_OID.get(i).length() - 4);
 			for (int j = 0; j < n_Equip_OID; j++) {
+				String Equip_OID_Generated = Generatore_Equip_OID.Generate_Equip_OID(Owner);
+				while (addIdNotDuplicated(Equip_OID_Generated,Lista_Equip_OID,0,Equip_OID_Generated.length()) == false) {
+					System.out.println("Duplicated");
+					Equip_OID_Generated = Generatore_Equip_OID.Generate_Equip_OID(Owner);
+				}
 				Lista_Equip_OID.add(Generatore_Equip_OID.Generate_Equip_OID(Owner));
 			}
 		}
@@ -272,21 +277,19 @@ public class Utilities {
 		return false;
 	}
 	
-	public static boolean addIdNotDuplicated(String String_OID, ArrayList<String> Lista) {
+	public static boolean addIdNotDuplicated(String String_OID, List<String> Lista,int element_index_start,int element_index_end) {
+		String filter_OID = String_OID.substring(element_index_start,element_index_end);
 		for (int j = 0; j < Lista.size(); j++) {
 
-			System.out.println(String_OID.substring(String_OID.length() - 4) + " = "
-					+ Lista.get(j).substring(Lista.get(j).length() - 4));
-
-			if (String_OID.equals(Lista.get(j)) || String_OID.substring(String_OID.length() - 4)
-					.equals(Lista.get(j).substring(Lista.get(j).length() - 4))) {
+			System.out.println("Inizio confronto " + filter_OID + " = " + Lista.get(j).substring(element_index_start, element_index_end));
+			
+			if (filter_OID.equals(Lista.get(j).substring(element_index_start, element_index_end))) { 
+				//|| String_OID.substring(String_OID.length() - 4).equals(Lista.get(j).substring(Lista.get(j).length() - 4))) {
 				return false;
-			} else {
-				Lista.add(String_OID);
-				return true;
 			}
 		}
-		return false;
+		Lista.add(String_OID);
+		return true;
 	}
 
 	public static void writeFile(String directory, String filename) {
