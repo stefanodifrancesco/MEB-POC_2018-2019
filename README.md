@@ -1,8 +1,18 @@
 # MEB-POC_2018-2019
 
-## Instructions
+# Table of contents
+1. [Introduction](#introduction)
+2. [Instructions](#instructions)
+    1. [MySQL Cluster](#mysql)
+    2. [Kafka](#kafka)
+3. [Running](#running)
 
-#### MySQL Cluster (localhost)
+## This is the introduction <a name="introduction"></a>
+Some introduction text, formatted in heading 2 style
+
+## Instructions <a name="instructions"></a>
+
+#### MySQL Cluster (localhost) <a name="mysql"></a>
 
 Please download the ZIP archive of MySql Cluster from one of the following links:
 
@@ -93,7 +103,7 @@ Now set a password for the **root**:
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 ```
 
-## Kafka (localhost)
+## Kafka (localhost) <a name="kafka"></a>
 
 > NOTE: Following commands run on Windows. On unix systems you can use sh scripts in bin folder 
 
@@ -129,3 +139,6 @@ Open a Powershell on the root of Kafka directory:
 > java -cp .\instance2\StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
 > java -cp .\instance3\StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
 ```
+
+## Running <a name="running"></a>
+The second paragraph text
