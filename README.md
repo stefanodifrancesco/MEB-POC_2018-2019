@@ -10,9 +10,9 @@ Please download the ZIP archive of MySql Cluster from one of the following links
 
 [MySQL Cluster, ZIP Archive 64-bit](https://dev.mysql.com/downloads/file/?id=484008)
 
-Extract the archive and rename the folder *mysqlc*
+Extract the archive and rename the folder as *mysqlc*
 
-Open a shell in the extracted folder and run:
+Open a command prompt in the extracted folder and run:
 
 ```
 > .\bin\mysqld --initialize-insecure
@@ -24,7 +24,7 @@ We will set a password at the end. Now create the following directory tree:
 Create two file in the *conf* folder:
 > NOTE: Change **YOUR_PATH** to point the directories just created
 
-#### my.ini
+#### my.cnf
 ```
 [mysqld]
 ndbcluster
@@ -66,7 +66,7 @@ Copy necessary schemas initialized before:
 > copy data\ndbinfo my_cluster\mysqld_data\ndbinfo
 > copy data\performance_schema my_cluster\mysqld_data\performance_schema
 ```
-Start the ndb manager service:
+Start the ndb manager service with the following command where the string YOUR_PATH is replaced with the path to your *mysqlc* folder:
 ```
 > .\bin\ndb_mgmd -f .\my_cluster\conf\config.ini --initial --configdir=C:\YOUR_PATH\mysqlc\my_cluster\conf
 ```
@@ -79,7 +79,7 @@ With another command prompt you can see the status of the nodes with the followi
 ```
 .\bin\ndb_mgm -e show
 ```
-> NOTE: If the *mysqld* node result as connected, please stop any other process named *mysqld* running on the system. 
+> NOTE: If the *mysqld* node with id=50 is connected, please stop any other process named *mysqld* running on the system. 
 
 Finally run the mysqld service with:
 ```
@@ -87,9 +87,9 @@ Finally run the mysqld service with:
 ```
 Open the *mysql* shell running:
 ```
-.\bin\mysql -u root --skip-password
+.\bin\mysql -u root --skip-password --port=5000
 ```
-Now assign a password to the **root**:
+Now set a password for the **root**:
 ```
 mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
 ```
