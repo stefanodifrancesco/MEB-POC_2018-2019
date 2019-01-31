@@ -60,27 +60,24 @@ public class Utilities {
 		try {
 			broadcastAdress = InetAddress.getByName("255.255.255.255");
 		} catch (UnknownHostException e) {
-			System.out.println("failed to se broadcast adress: " + e.toString());
+			System.out.println("failed to send broadcast address: " + e.toString());
 		}
 		return broadcastAdress;
 	}
 
-	public static InhibitEvent Generate_Inhibit_Event(String equipOID, String recipeOID) {
+	public static InhibitEvent Generate_Inhibit_Event(String equipOID, String recipeOID,int probability) {
 		InhibitEvent inhibitEvent = new InhibitEvent();
 
 		Inserted inserted = new Inserted();
 		Deleted del = new Deleted();
 
-		if (new Random().nextInt(100) != 1) {
+		if (new Random().nextInt(probability) != 1) {
 			inserted.setEquip_OID(equipOID);
 			del.setEquip_OID(equipOID);
 		} else {
 			inserted.setEquip_OID("");
 			del.setEquip_OID("");
-		}
-		
-		inserted.setEquip_OID("");
-		del.setEquip_OID("");
+		}		
 		
 		inserted.setRecipe_OID(recipeOID);
 		del.setRecipe_OID(recipeOID);
@@ -164,12 +161,12 @@ public class Utilities {
 		return "No message";
 	}
 
-	public static List<String> import_Equips_From_File() {
+	public static List<String> import_Equips_From_File(String dir,String filename) {
 		List<String> Lista = new ArrayList<String>();
 
 		FileReader res = null;
 		try {
-			res = new FileReader(new File("src/main/resources/EquipList.txt"));
+			res = new FileReader(new File(dir + filename));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
@@ -197,12 +194,12 @@ public class Utilities {
 		return Lista;
 	}
 
-	public static List<String> import_Recipes_From_File() {
+	public static List<String> import_Recipes_From_File(String dir,String filename) {
 		List<String> Lista = new ArrayList<String>();
 
 		FileReader res = null;
 		try {
-			res = new FileReader(new File("src/main/resources/RecipeList.txt"));
+			res = new FileReader(new File(dir + filename));
 		} catch (FileNotFoundException e1) {
 			// TODO Auto-generated catch block
 			e1.printStackTrace();
