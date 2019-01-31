@@ -31,7 +31,6 @@ ndbcluster
 datadir=C:\\YOUR_PATH\\mysqlc\\my_cluster\\mysqld_data
 basedir=C:\\YOUR_PATH\\mysqlc
 port=5000
-default_time_zone='+00:00'
 ```
 #### config.ini
 ```
