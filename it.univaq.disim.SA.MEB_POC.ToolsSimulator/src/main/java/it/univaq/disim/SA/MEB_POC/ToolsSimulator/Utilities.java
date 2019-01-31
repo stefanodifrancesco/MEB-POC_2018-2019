@@ -1,9 +1,11 @@
 package it.univaq.disim.SA.MEB_POC.ToolsSimulator;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -288,7 +290,7 @@ public class Utilities {
 	}
 
 	public static void writeFile(String directory, String filename) {
-		String path = filename;
+
 		boolean success = (new File(directory)).mkdir();
 
 		if (success) {

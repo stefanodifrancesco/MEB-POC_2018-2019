@@ -1,5 +1,4 @@
 package it.univaq.disim.SA.MEB_POC.ToolsSimulator.Models;
-package ToolSimulation;
 
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlRootElement;
