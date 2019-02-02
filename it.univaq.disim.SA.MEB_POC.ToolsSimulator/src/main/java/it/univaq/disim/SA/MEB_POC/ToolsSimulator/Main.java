@@ -1,27 +1,32 @@
 package it.univaq.disim.SA.MEB_POC.ToolsSimulator;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 import org.apache.commons.lang3.time.StopWatch;
 
 public class Main {
-	
+
+	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		
-		StopWatch stopwatch = new StopWatch();
+		/*List<String> recipes = Utilities.Generate_Recipe(100, "C:\\Users\\Stefano\\Desktop\\kafka_2.12-2.1.0\\", "RecipeList.txt");
+		Utilities.Generate_Equip(recipes, 4, "C:\\Users\\Stefano\\Desktop\\kafka_2.12-2.1.0\\", "EquipList.txt");*/
 
 		List<String> equipOIDs = Utilities.import_Equips_From_File();
 		List<String> recipeOIDs = Utilities.import_Recipes_From_File();
 
-		Counter messageCounter = new Counter();
-		stopwatch.start();
-
-		System.out.println("Starting tools! It will take 50 seconds...");
-
+		Counter holdONCounter = new Counter();
+		Counter holdOFFCounter = new Counter();
+		
+		List<ToolThread> tools = new ArrayList<ToolThread>();
+		StopWatch sw = new StopWatch();
+		
 		for (int i = 0; i < equipOIDs.size(); i++) {
-
+		//for (int i = 0; i < 5; i++) {
 			String equipOID = equipOIDs.get(i);
 			String category = equipOID.substring(equipOID.length() - 4);
 
@@ -31,32 +36,40 @@ public class Main {
 
 			String recipeOID = compatibleRecipes.get(new Random().nextInt(compatibleRecipes.size()));
 
-			ToolThread tool = new ToolThread(equipOID, recipeOID, messageCounter);
-			tool.start();
-
-			try {
-				Thread.sleep(50);
-			} catch (InterruptedException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
+			ToolThread tool = new ToolThread(equipOID, recipeOID, holdONCounter, holdOFFCounter);
+			tools.add(tool);
+			
 		}
+		
+		for (ToolThread tool : tools) {
+			tool.start();
+		}
+		sw.start();
+		System.out.println("400 tools started sending messages...");
 
 		while (true) {
-
-			if (stopwatch.getTime() > 60000) {
-				System.out.println(
-						"Current sending frequence: " + messageCounter.getValue() + " messages every 30 minute.");
-				messageCounter.setValue(0);
-				stopwatch.reset();
-			}
+			 
+			System.out.println("messages sent: HoldON  " + holdONCounter.getValue());
+			System.out.println("messages sent: HoldOFF " + holdOFFCounter.getValue());
+			System.out.println("messages sent: Total   " + (holdONCounter.getValue() + holdOFFCounter.getValue()));
 
 			try {
-				Thread.sleep(1000);
+				Thread.sleep(10000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
+			
+			if (sw.getTime(TimeUnit.MINUTES) > 3) {
+				for (ToolThread tool : tools) {
+					tool.stop();
+				}
+				System.out.println("messages sent: HoldON  " + holdONCounter.getValue());
+				System.out.println("messages sent: HoldOFF " + holdOFFCounter.getValue());
+				System.out.println("messages sent: Total   " + (holdONCounter.getValue() + holdOFFCounter.getValue()));
+				return;
+			}
+			
 		}
 	}
 

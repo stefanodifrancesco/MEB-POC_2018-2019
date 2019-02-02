@@ -3,11 +3,11 @@ package it.univaq.disim.SA.MEB_POC.ToolsSimulator;
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.io.StringWriter;
 import java.net.DatagramPacket;
@@ -65,7 +65,7 @@ public class Utilities {
 		return broadcastAdress;
 	}
 
-	public static InhibitEvent Generate_Inhibit_Event(String equipOID, String recipeOID,int probability) {
+	public static InhibitEvent Generate_Inhibit_Event(String equipOID, String recipeOID, int probability) {
 		InhibitEvent inhibitEvent = new InhibitEvent();
 
 		Inserted inserted = new Inserted();
@@ -77,8 +77,8 @@ public class Utilities {
 		} else {
 			inserted.setEquip_OID("");
 			del.setEquip_OID("");
-		}		
-		
+		}
+
 		inserted.setRecipe_OID(recipeOID);
 		del.setRecipe_OID(recipeOID);
 
@@ -88,8 +88,8 @@ public class Utilities {
 		inserted.setHold_type("ProcessEquipHold_" + new Random().nextInt(50));
 		del.setHold_type(inserted.getHold_type());
 
-		inserted.setHold_flag(new Random().nextInt(1) == 0 ? "N" : "Y");
-		del.setHold_flag(inserted.getHold_flag().equalsIgnoreCase("N") ? "Y" : "N");
+		inserted.setHold_flag("Y");
+		del.setHold_flag("N");
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		inserted.setEvent_datetime(df.format(new Date()));
@@ -121,13 +121,8 @@ public class Utilities {
 		Inverted_Inserted.setHold_type(Original_Inhibit.getInserted().getHold_type());
 		Inverted_Deleted.setHold_type(Original_Inhibit.getDeleted().getHold_type());
 
-		String OldInsHoldFlag = Original_Inhibit.getInserted().getHold_flag();
-		String NewInsHoldFlag = (OldInsHoldFlag.equals("Y") ? "N" : "Y");
-		String OldDelHoldFlag = Original_Inhibit.getDeleted().getHold_flag();
-		String NewDelHoldFlag = (OldDelHoldFlag.equals("Y") ? "N" : "Y");
-
-		Inverted_Inserted.setHold_flag(NewInsHoldFlag);
-		Inverted_Deleted.setHold_flag(NewDelHoldFlag);
+		Inverted_Inserted.setHold_flag("N");
+		Inverted_Deleted.setHold_flag("Y");
 
 		DateFormat df = new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss.SSS");
 		Inverted_Inserted.setEvent_datetime(df.format(new Date()));
@@ -141,19 +136,18 @@ public class Utilities {
 	}
 
 	public static String Inhibit_to_XML(InhibitEvent event) {
-		
-		try {JAXBContext jaxbContext = JAXBContext.newInstance(InhibitEvent.class);
-		Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
-		     
-		jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
-		StringWriter sw = new StringWriter();
-		jaxbMarshaller.marshal(event, sw);
-		
-		String sw_modified = sw.toString().replaceAll("<Inserted>","<Inserted xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
-										  .replaceAll("<Deleted>", "<Inserted xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\">")
-										  .replaceAll("<equip_OID xsi:nil=\"true\"/>","<equip_OID/>");
-		
-		return sw_modified;
+
+		try {
+			JAXBContext jaxbContext = JAXBContext.newInstance(InhibitEvent.class);
+			Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+
+			jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+			StringWriter sw = new StringWriter();
+			jaxbMarshaller.marshal(event, sw);
+
+			String sw_modified = sw.toString().replaceAll("<equip_OID xsi:nil=\"true\"/>", "<equip_OID/>");
+
+			return sw_modified;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -161,18 +155,19 @@ public class Utilities {
 		return "No message";
 	}
 
-	public static List<String> import_Equips_From_File(String dir,String filename) {
+	public static List<String> import_Equips_From_File() {
 		List<String> Lista = new ArrayList<String>();
 
-		FileReader res = null;
+		String path = "./EquipList.txt";
+		FileInputStream fis = null;
 		try {
-			res = new FileReader(new File(dir + filename));
-		} catch (FileNotFoundException e1) {
+			fis = new FileInputStream(path);
+		} catch (FileNotFoundException e2) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e2.printStackTrace();
 		}
 
-		BufferedReader reader = new BufferedReader(res);
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 		String line = null;
 
 		try {
@@ -194,17 +189,19 @@ public class Utilities {
 		return Lista;
 	}
 
-	public static List<String> import_Recipes_From_File(String dir,String filename) {
+	public static List<String> import_Recipes_From_File() {
 		List<String> Lista = new ArrayList<String>();
 
-		FileReader res = null;
+		String path = "./RecipeList.txt";
+		FileInputStream fis = null;
 		try {
-			res = new FileReader(new File(dir + filename));
-		} catch (FileNotFoundException e1) {
+			fis = new FileInputStream(path);
+		} catch (FileNotFoundException e2) {
 			// TODO Auto-generated catch block
-			e1.printStackTrace();
+			e2.printStackTrace();
 		}
-		BufferedReader reader = new BufferedReader(res);
+		
+		BufferedReader reader = new BufferedReader(new InputStreamReader(fis));
 		String line = null;
 
 		try {
@@ -225,7 +222,7 @@ public class Utilities {
 
 		return Lista;
 	}
-	
+
 	public static List<String> Generate_Recipe(int n_digit, String dir, String nomefile) {
 		List<String> Lista_Recipe_OID = new ArrayList<>();
 		Generatore_OID Generatore_Recipe_OID = new Generatore_OID();
@@ -233,7 +230,8 @@ public class Utilities {
 		for (int i = 0; i < n_digit; i++) {
 			if (i > 0) {
 				String Recipe_OID_Generated = Generatore_Recipe_OID.Generate_Recipe_OID();
-				while (addIdNotDuplicated(Recipe_OID_Generated, Lista_Recipe_OID,Recipe_OID_Generated.length()-4,Recipe_OID_Generated.length()) == false) {
+				while (addIdNotDuplicated(Recipe_OID_Generated, Lista_Recipe_OID, Recipe_OID_Generated.length() - 4,
+						Recipe_OID_Generated.length()) == false) {
 					System.out.println("Duplicated");
 					Recipe_OID_Generated = Generatore_Recipe_OID.Generate_Recipe_OID();
 				}
@@ -252,18 +250,19 @@ public class Utilities {
 		for (int i = 0; i < Lista_Recipe_OID.size(); i++) {
 			String Owner = Lista_Recipe_OID.get(i).substring(Lista_Recipe_OID.get(i).length() - 4);
 			for (int j = 0; j < n_Equip_OID; j++) {
-				String Equip_OID_Generated = Generatore_Equip_OID.Generate_Equip_OID(Owner);
-				while (addIdNotDuplicated(Equip_OID_Generated,Lista_Equip_OID,0,Equip_OID_Generated.length()) == false) {
+				/*String Equip_OID_Generated = Generatore_Equip_OID.Generate_Equip_OID(Owner);
+				while (addIdNotDuplicated(Equip_OID_Generated, Lista_Equip_OID, 0,
+						Equip_OID_Generated.length()) == false) {
 					System.out.println("Duplicated");
 					Equip_OID_Generated = Generatore_Equip_OID.Generate_Equip_OID(Owner);
-				}
+				}*/
 				Lista_Equip_OID.add(Generatore_Equip_OID.Generate_Equip_OID(Owner));
 			}
 		}
 		writeList(Lista_Equip_OID, dir, nomefile);
 	}
-	
-	public static boolean isDuplcated(String id, ArrayList<String> Lista) {
+
+	public static boolean isDuplicated(String id, ArrayList<String> Lista) {
 		String Id_Owner = id.substring(id.length() - 4);
 		for (String Archivied_id : Lista) {
 			String Archivied_Id_Owner = Archivied_id.substring(Archivied_id.length() - 4);
@@ -273,15 +272,18 @@ public class Utilities {
 		}
 		return false;
 	}
-	
-	public static boolean addIdNotDuplicated(String String_OID, List<String> Lista,int element_index_start,int element_index_end) {
-		String filter_OID = String_OID.substring(element_index_start,element_index_end);
+
+	public static boolean addIdNotDuplicated(String String_OID, List<String> Lista, int element_index_start,
+			int element_index_end) {
+		String filter_OID = String_OID.substring(element_index_start, element_index_end);
 		for (int j = 0; j < Lista.size(); j++) {
 
-			System.out.println("Inizio confronto " + filter_OID + " = " + Lista.get(j).substring(element_index_start, element_index_end));
-			
-			if (filter_OID.equals(Lista.get(j).substring(element_index_start, element_index_end))) { 
-				//|| String_OID.substring(String_OID.length() - 4).equals(Lista.get(j).substring(Lista.get(j).length() - 4))) {
+			System.out.println("Inizio confronto " + filter_OID + " = "
+					+ Lista.get(j).substring(element_index_start, element_index_end));
+
+			if (filter_OID.equals(Lista.get(j).substring(element_index_start, element_index_end))) {
+				// || String_OID.substring(String_OID.length() -
+				// 4).equals(Lista.get(j).substring(Lista.get(j).length() - 4))) {
 				return false;
 			}
 		}
@@ -325,10 +327,16 @@ public class Utilities {
 	public static void writeList(List<String> list_to_write, String dir, String nomefile) {
 		Generatore_OID gen_OID = new Generatore_OID();
 		writeFile(dir, nomefile);
-		list_to_write.forEach(item -> {
-			appendStrToFile(dir + nomefile, "'" + item + "','" + gen_OID.random_string(4, "ABCDEF0123456789") + "'");
-			appendStrToFile(dir + nomefile + "Test1.csv", item.substring(0, item.length() - 4));
-			appendStrToFile(dir + nomefile + "Test2.csv", item.substring(item.length() - 4));
-		});
+		List<String> names = new ArrayList<String>();
+		for (int p = 0; p < 100; p++) {
+			names.add(gen_OID.random_string(4, "ABCDEFGHILMNOPQRSTUVZ")
+					+ gen_OID.random_string(5, "0123456789"));
+		}
+		for (int i = 0; i < list_to_write.size(); i++) {
+			String temp = list_to_write.get(i);
+			appendStrToFile(dir + nomefile, "'" + temp + "','" + names.get(i % 100) + "'");
+			appendStrToFile(dir + nomefile + "Test1.csv", temp.substring(0, temp.length() - 4));
+			appendStrToFile(dir + nomefile + "Test2.csv", temp.substring(temp.length() - 4));
+		}
 	}
 }
