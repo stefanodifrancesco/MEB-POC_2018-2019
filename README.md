@@ -5,10 +5,15 @@
 2. [Instructions](#instructions)
     1. [MySQL Cluster](#mysql)
     2. [Kafka](#kafka)
-3. [Running](#running)
+3. [Running report tool](#running)
 
-## This is the introduction <a name="introduction"></a>
-Some introduction text, formatted in heading 2 style
+## Introduction <a name="introduction"></a>
+The ToolsSimulator will simulate 400 tools broadcasting 80000 XML messages in 30 minutes. Half of them contains the start time of an holding operation, the other half contains the end time. Every message brings the tool OID, the recipe OID and the type of hold.
+The broadcast listener will intercept all this messages and publish them on the topic 'toolsEvents' of Kafka.   
+The StreamProcessor will aggregate them retrieving common names of tools and recipes from 'raw_data' database stored in MySQL Cluster.  
+It will also join start and end times to create a single aggregated messaged republished on the 'aggregateddata' topic.  
+Then, a plugin of Kafka will take care of inserting this final messages to the 'analytics_database'.  
+The report tool can be used to analyze the history of messages.
 
 ## Instructions <a name="instructions"></a>
 
