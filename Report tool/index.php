@@ -42,7 +42,7 @@
 							MOD( TIMESTAMPDIFF( SECOND, HoldStartDateTime, HoldEndDateTime), 60), \' seconds \'
 						) as dif, HoldType, RecipeName, EquipName
 						FROM analytics_database.aggregateddata 
-						ORDER BY dif 
+						ORDER BY TIMESTAMPDIFF( MICROSECOND, HoldStartDateTime, HoldEndDateTime) 
 						DESC
 						LIMIT 5') as $row) {
 						echo "<tr>";
