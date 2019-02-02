@@ -100,7 +100,7 @@ shell> .\bin\mysql -u root --skip-password --port=5000
 ```
 Now set a password for the **root**:
 ```
-mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'new_password';
+mysql> ALTER USER 'root'@'localhost' IDENTIFIED BY 'root';
 ```
 Now import 'raw_data' and 'analytics_database' from the folder *MySQL Cluster Dump* of your local repository:
 ```
