@@ -1,5 +1,7 @@
 package it.univaq.disim.SA.MEB_POC.StreamProcessor;
 
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.io.StringReader;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -26,7 +28,8 @@ import org.apache.kafka.streams.kstream.ValueJoiner;
 import it.univaq.disim.SA.MEB_POC.StreamProcessor.Models.InhibitEvent;
 
 public class StreamInstance {
-
+	
+	// If running from IDE the following settings will be used
 	private final static String TOPIC = "toolsEvents";
 	private final static String BOOTSTRAP_SERVERS = "localhost:9092,localhost:9093,localhost:9094";
 	private final static String RAW_DATA_DATABASE_URL = "jdbc:mysql://localhost:5000/raw_data";
@@ -35,30 +38,42 @@ public class StreamInstance {
 
 	static Connection rawdataConn = null;
 	static PreparedStatement rawdataPrepareStat = null;
+	static int holdONCounter;
+	static int holdOFFCounter;
+	static int publishedCounter;
 
 	static void runStream() {
 
 		makeJDBCConnection();
 
 		Properties props = new Properties();
-		props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, BOOTSTRAP_SERVERS);
+		props.put(StreamsConfig.BOOTSTRAP_SERVERS_CONFIG, getServers());
 		// Setting the following property is necessary for instances synchronization
 		// The application.id should be the same for all instances
 		props.put(StreamsConfig.APPLICATION_ID_CONFIG, "MEBKafkaStreamCluster");
 		props.put(StreamsConfig.DEFAULT_KEY_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
 		props.put(StreamsConfig.DEFAULT_VALUE_SERDE_CLASS_CONFIG, Serdes.String().getClass().getName());
-		// Setting the following property is only used in testing scenarios for running more instances on localhost
+		props.put(StreamsConfig.DEFAULT_TIMESTAMP_EXTRACTOR_CLASS_CONFIG, TimeExtractor.class.getName());
+		// Setting the following property is only used in testing scenarios for running
+		// more instances on localhost
 		// If not set the default directory is "/tmp/kafka-streams"
-		//props.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams/instance3");
+		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/kafka-streams1-dir");
+		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/kafka-streams2-dir");
+		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/kafka-streams3-dir");
 
 		StreamsBuilder builder = new StreamsBuilder();
 
-		KStream<String, String> inputStream = builder.stream(TOPIC);
+		KStream<String, String> inputStream = builder.stream(getTopic());
 
 		KStream<String, String> holdONStream = inputStream.filter(new Predicate<String, String>() {
 			public boolean test(String key, String value) {
 				InhibitEvent event = JAXB.unmarshal(new StringReader(value), InhibitEvent.class);
 				if (event.getInserted().getHold_flag().equals("Y")) {
+					holdONCounter += 1;
+					if (holdONCounter % 10 == 0) {
+						System.out.println("holdON arrived: " + holdONCounter);
+					}
+
 					return true;
 				} else {
 					return false;
@@ -67,13 +82,19 @@ public class StreamInstance {
 		});
 		holdONStream.to("globalTableHoldON");
 
-		// The HoldOn events are store in a GlobalKTable to be read by every Kafka Stream instance of the 'MEBKafkaStreamCluster'
+		// The HoldOn events are store in a GlobalKTable to be read by every Kafka
+		// Stream instance of the 'MEBKafkaStreamCluster'
 		GlobalKTable<String, String> globalTableHoldON = builder.globalTable("globalTableHoldON");
 
 		KStream<String, String> holdOFFStream = inputStream.filter(new Predicate<String, String>() {
 			public boolean test(String key, String value) {
 				InhibitEvent event = JAXB.unmarshal(new StringReader(value), InhibitEvent.class);
 				if (event.getInserted().getHold_flag().equals("N")) {
+					holdOFFCounter += 1;
+					if (holdOFFCounter % 10 == 0) {
+						System.out.println("holdOFF arrived: " + holdOFFCounter);
+					}
+
 					return true;
 				} else {
 					return false;
@@ -96,8 +117,10 @@ public class StreamInstance {
 
 						InhibitEvent ONevent = JAXB.unmarshal(new StringReader(value2), InhibitEvent.class);
 						InhibitEvent OFFevent = JAXB.unmarshal(new StringReader(value1), InhibitEvent.class);
+
 						YandN.add(ONevent);
 						YandN.add(OFFevent);
+						System.out.println("Joining...");
 						return YandN;
 					}
 				});
@@ -147,7 +170,8 @@ public class StreamInstance {
 							+ OFFevent.getInserted().getEvent_datetime() + "\"\r\n" + " }\r\n" + "}";
 
 					result.add(new KeyValue<String, String>(key, json));
-					System.out.println("New aggregated data published on output topic!");
+					publishedCounter++;
+					System.out.println("New aggregated data published on output topic - Total: " + publishedCounter);
 				}
 
 				return result;
@@ -155,7 +179,8 @@ public class StreamInstance {
 		};
 
 		KStream<String, String> outputStream = joined.flatMap(mapper);
-		// The topic name should be of the same name of MySql table in Analytics Database
+		// The topic name should be of the same name of MySql table in Analytics
+		// Database
 		outputStream.to("aggregateddata");
 
 		KafkaStreams myStream = new KafkaStreams(builder.build(), props);
@@ -165,7 +190,7 @@ public class StreamInstance {
 	private static void makeJDBCConnection() {
 		try {
 
-			rawdataConn = DriverManager.getConnection(RAW_DATA_DATABASE_URL, RAW_DATA_DATABASE_USER, RAW_DATA_DATABASE_PASSWORD);
+			rawdataConn = DriverManager.getConnection(getDBurl(), getDBuser(), getDBpassword());
 			if (rawdataConn != null) {
 				System.out.println("Connection to 'raw_data' DB successful!");
 			} else {
@@ -241,5 +266,106 @@ public class StreamInstance {
 		}
 
 		return final_result;
+	}
+
+	private static String getServers() {
+
+		String servers = null;
+		Properties mainProperties = new Properties();
+
+		try {
+			FileInputStream file;
+			String path = "./config.properties";
+			file = new FileInputStream(path);
+
+			mainProperties.load(file);
+			file.close();
+			servers = mainProperties.getProperty("servers");
+		} catch (IOException e) {
+			servers = BOOTSTRAP_SERVERS;
+		}
+
+		return servers;
+	}
+
+	private static String getTopic() {
+
+		String topic = null;
+		Properties mainProperties = new Properties();
+
+		try {
+			FileInputStream file;
+			String path = "./config.properties";
+			file = new FileInputStream(path);
+
+			mainProperties.load(file);
+			file.close();
+			topic = mainProperties.getProperty("topic");
+		} catch (IOException e) {
+			topic = TOPIC;
+		}
+
+		return topic;
+	}
+
+	private static String getDBurl() {
+
+		String url = null;
+		Properties mainProperties = new Properties();
+
+		try {
+			FileInputStream file;
+			String path = "./config.properties";
+			file = new FileInputStream(path);
+
+			mainProperties.load(file);
+			file.close();
+			url = mainProperties.getProperty("mysqlcluster.url");
+		} catch (IOException e) {
+			url = RAW_DATA_DATABASE_URL;
+		}
+
+		return url;
+	}
+
+	private static String getDBuser() {
+
+		String user = null;
+		Properties mainProperties = new Properties();
+
+		try {
+			FileInputStream file;
+			String path = "./config.properties";
+			file = new FileInputStream(path);
+
+			mainProperties.load(file);
+			file.close();
+			user = mainProperties.getProperty("mysqlcluster.user");
+		} catch (IOException e) {
+			user = RAW_DATA_DATABASE_USER;
+		}
+		
+		return user;
+	}
+
+	private static String getDBpassword() {
+
+		String pass = null;
+		Properties mainProperties = new Properties();
+
+		try {
+			FileInputStream file;
+			String path = "./config.properties";
+			file = new FileInputStream(path);
+
+			mainProperties.load(file);
+			file.close();
+			
+			pass = mainProperties.getProperty("mysqlcluster.password");
+		} catch (IOException e) {
+			pass = RAW_DATA_DATABASE_PASSWORD;
+		}
+
+		return pass;
 	}
 }
