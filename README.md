@@ -137,12 +137,12 @@ shell> .\bin\windows\kafka-topics.bat --create --topic aggregateddata --zookeepe
 ```
 shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone.properties .\config\sink-connect-jdbc.properties
 ```
-#### Start three Kafka Stream processor
+#### Start Kafka Stream processors
+###### There are three Kafka Stream instances in the Release folder, you can run all of them to improve scalability
 ```
-shell> java -cp .\instance1\StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
-shell> java -cp .\instance2\StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
-shell> java -cp .\instance3\StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
+shell> cd Release\KafkaStream_Instance1
+shell> java -cp StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
 ```
 
-## Running <a name="running"></a>
-The second paragraph text
+## Running report tool<a name="running"></a>
+The *Report tool* folder contains a .php file to be runned on a server.
