@@ -29,8 +29,9 @@ import it.univaq.disim.SA.MEB_POC.StreamProcessor.Models.InhibitEvent;
 
 public class StreamInstance {
 	
-	// If running from IDE the following settings will be used
-	private final static String TOPIC = "toolsEvents";
+	// If running from Eclipse the following settings will be used
+	private final static String INPUTTOPIC = "toolsEvents";
+	private final static String OUTPUTTOPIC = "aggregateddata";
 	private final static String BOOTSTRAP_SERVERS = "localhost:9092,localhost:9093,localhost:9094";
 	private final static String RAW_DATA_DATABASE_URL = "jdbc:mysql://localhost:5000/raw_data";
 	private final static String RAW_DATA_DATABASE_USER = "root";
@@ -57,22 +58,20 @@ public class StreamInstance {
 		// Setting the following property is only used in testing scenarios for running
 		// more instances on localhost
 		// If not set the default directory is "/tmp/kafka-streams"
-		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/kafka-streams1-dir");
-		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/kafka-streams2-dir");
-		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/kafka-streams3-dir");
+		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams1-dir");
+		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams2-dir");
+		// props.put(StreamsConfig.STATE_DIR_CONFIG, "/tmp/kafka-streams3-dir");
 
 		StreamsBuilder builder = new StreamsBuilder();
 
-		KStream<String, String> inputStream = builder.stream(getTopic());
+		KStream<String, String> inputStream = builder.stream(getInputTopic());
 
 		KStream<String, String> holdONStream = inputStream.filter(new Predicate<String, String>() {
 			public boolean test(String key, String value) {
 				InhibitEvent event = JAXB.unmarshal(new StringReader(value), InhibitEvent.class);
 				if (event.getInserted().getHold_flag().equals("Y")) {
 					holdONCounter += 1;
-					if (holdONCounter % 10 == 0) {
-						System.out.println("holdON arrived: " + holdONCounter);
-					}
+					System.out.println("holdON arrived: " + holdONCounter);
 
 					return true;
 				} else {
@@ -91,9 +90,7 @@ public class StreamInstance {
 				InhibitEvent event = JAXB.unmarshal(new StringReader(value), InhibitEvent.class);
 				if (event.getInserted().getHold_flag().equals("N")) {
 					holdOFFCounter += 1;
-					if (holdOFFCounter % 10 == 0) {
-						System.out.println("holdOFF arrived: " + holdOFFCounter);
-					}
+					System.out.println("holdOFF arrived: " + holdOFFCounter);
 
 					return true;
 				} else {
@@ -181,7 +178,7 @@ public class StreamInstance {
 		KStream<String, String> outputStream = joined.flatMap(mapper);
 		// The topic name should be of the same name of MySql table in Analytics
 		// Database
-		outputStream.to("aggregateddata");
+		outputStream.to(getOutputTopic());
 
 		KafkaStreams myStream = new KafkaStreams(builder.build(), props);
 		myStream.start();
@@ -288,9 +285,9 @@ public class StreamInstance {
 		return servers;
 	}
 
-	private static String getTopic() {
+	private static String getInputTopic() {
 
-		String topic = null;
+		String inputTopic = null;
 		Properties mainProperties = new Properties();
 
 		try {
@@ -300,12 +297,32 @@ public class StreamInstance {
 
 			mainProperties.load(file);
 			file.close();
-			topic = mainProperties.getProperty("topic");
+			inputTopic = mainProperties.getProperty("inputtopic");
 		} catch (IOException e) {
-			topic = TOPIC;
+			inputTopic = INPUTTOPIC;
 		}
 
-		return topic;
+		return inputTopic;
+	}
+	
+	private static String getOutputTopic() {
+
+		String OutputTopic = null;
+		Properties mainProperties = new Properties();
+
+		try {
+			FileInputStream file;
+			String path = "./config.properties";
+			file = new FileInputStream(path);
+
+			mainProperties.load(file);
+			file.close();
+			OutputTopic = mainProperties.getProperty("outputtopic");
+		} catch (IOException e) {
+			OutputTopic = OUTPUTTOPIC;
+		}
+
+		return OutputTopic;
 	}
 
 	private static String getDBurl() {

@@ -137,10 +137,12 @@ shell> .\bin\windows\kafka-topics.bat --create --topic toolsEvents --zookeeper l
 shell> .\bin\windows\kafka-topics.bat --create --topic globalTableHoldON --zookeeper localhost:2181 --partitions 3 --replication-factor 2
 shell> .\bin\windows\kafka-topics.bat --create --topic aggregateddata --zookeeper localhost:2181 --partitions 3 --replication-factor 2
 ```
-#### Start JDBC Sink Connector
+#### Start one or more instances of the JDBC Sink Connector plugin
 
 ```
-shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone.properties .\config\sink-connect-jdbc.properties
+shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone1.properties .\config\sink-connect-jdbc.properties
+shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone2.properties .\config\sink-connect-jdbc.properties
+shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone3.properties .\config\sink-connect-jdbc.properties
 ```
 #### Start Kafka Stream processors
 ###### There are three Kafka Stream instances in the Release folder, you can run all of them to improve scalability
@@ -148,6 +150,16 @@ shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone.properti
 shell> cd Release\KafkaStream_Instance1
 shell> java -cp StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
 ```
-
+###### Each instance folder contains also a configuration file:
+#### config.properties
+```
+inputtopic: toolsEvents
+outputtopic: aggregateddata
+servers: localhost:9093,localhost:9094,localhost:9095
+mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
+mysqlcluster.user: root
+mysqlcluster.password: root
+```
+> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
 ## Running report tool<a name="running"></a>
 The *Report tool* folder contains a .php file to be runned on a server.
