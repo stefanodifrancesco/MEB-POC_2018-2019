@@ -36,18 +36,21 @@ namespace broadcastListener
         Dictionary<string, myMessage> msgBymsgKey;
         // nb: se ho più d'un ricevitore l'ordine nelle code potrebbe essere diverso tra master e slave a seconda dello scheduling.
         // quindi se ci sono thread multipli e crasha il master, in extremis rimando tutto da 1 secondo prima dell'ultimo update del master
-        public static TimeSpan sicurezzaPerDelayDeiThread; /*{
+        /*{
             get {
                 if (delaythreadHiddenVariable.TotalDays == 64.0) { delaythreadHiddenVariable = Program.args.slaveReceiverThreads > 1 ? new TimeSpan(0, 0, 0, 1, 0) : new TimeSpan(0); }
                 return delaythreadHiddenVariable;
             }
+        }*/
+        private static TimeSpan delaythreadHiddenVariable = new TimeSpan(64, 0, 0, 0, 0);
+        public static TimeSpan maxExpectedMessageDelay {
+            get {
+                if (delaythreadHiddenVariable.Days == 64) { delaythreadHiddenVariable = new TimeSpan(Program.args.maxExpectedMessageDelay); };
+                return delaythreadHiddenVariable; }
         }
-        private static TimeSpan delaythreadHiddenVariable = new TimeSpan(64, 0, 0, 0, 0);*/
-
         public MessageQueue() {
             queue = new SortedSet<myMessage>();
-            this.msgBymsgKey = new Dictionary<string, myMessage>();
-            sicurezzaPerDelayDeiThread = Program.args.slaveReceiverThreads > 1 ? new TimeSpan(0, 0, 0, 1, 0) : new TimeSpan(0); }
+            this.msgBymsgKey = new Dictionary<string, myMessage>(); }
         public int Count { get {
                 int i;
                 lock (this) { i = queue == null  ? -1 : this.queue.Count; }
@@ -104,7 +107,7 @@ namespace broadcastListener
 
         ICollection<myMessage> MessageQueueI.getOlderThan(myMessage msg, bool remove){
             if (msg == null) return new List<myMessage>(0);
-            return ((MessageQueueI)this).getOlderThan(msg.arrivalTime - MessageQueue.sicurezzaPerDelayDeiThread, remove); }
+            return ((MessageQueueI)this).getOlderThan(msg.arrivalTime - maxExpectedMessageDelay, remove); }
 
         ICollection<myMessage> MessageQueueI.getOlderThan(DateTime t, bool remove) {
             lock (this) {

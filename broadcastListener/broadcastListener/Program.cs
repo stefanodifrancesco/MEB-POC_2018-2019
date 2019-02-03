@@ -29,7 +29,7 @@ namespace broadcastListener
             if (args_Raw == null || args_Raw.Length < 1) { args_Raw = StartupArgJson.fakeinput(); }
             if (args_Raw.Length != 1) args_Raw = new string[] { "TriggerError Message: there must be only a single argument." };
             Program.args = StartupArgJson.deserialize(args_Raw[0]);
-            if (Program.args == null || !Program.args.Validate()) return;
+            if (Program.args == null || !Program.args.Validate(true)) return;
             try { Clipboard.SetText(args_Raw[0]); }catch(Exception e) { Program.pe("Unable to load JSON-string argument in clipboard, reason:" + e.ToString()); }
             HotRestart();
 

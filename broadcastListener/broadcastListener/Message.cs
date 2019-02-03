@@ -195,7 +195,7 @@ namespace broadcastListener
                     StartupArgJson args;
                     try { args = StartupArgJson.deserialize(this.data); } catch (Exception e) {
                         Program.pe(this.type + " body is not deserializable: " + this.data, e); break; }
-                    if (args == null || !args.Validate()) { Program.pe(this.type +" body is deserializable but with invalid content: " + this.data); break; }
+                    if (args == null || !args.Validate(false)) { Program.pe(this.type +" body is deserializable but with invalid content: " + this.data); break; }
                     Program.args = args;
                     Master.MasterCrashChecker.Abort();
                     Master.MasterCrashChecker = null;

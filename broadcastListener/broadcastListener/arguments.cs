@@ -10,11 +10,13 @@ using System.IO;
 namespace broadcastListener{
 
     public class StartupArgJson{
+        [JsonIgnore] public const string noErrorsResponse = "Valid.";
         public int broadcastPort_Tool, broadcastPort_Slaves;
         public bool enableGUI;
         public bool enablePrintSlave = false, enablePrintTool = false, enablePrintStatus = true;
         public List<Slave> replicatorsList;
         public int myPartitionNumber, partitionNumbers_Total;
+        //$ a value less than 1 will set the values equal to half of machine logic processors / 2 for each (rounded up).
         public int toolReceiverThreads, slaveReceiverThreads;
         // of your network
         public string broadcastAddress;
@@ -44,8 +46,13 @@ namespace broadcastListener{
         //enables test mode and display performance statistics.
         public bool benchmark;
 
-        //todo: non devono esserci campi non public, pare che non vengano serializzati
-        //public int replicationDegree;
+        //$todo: aggiungi alla wiki
+        // if master's slaveNotifyMode_Batch = false, this is meaningless, this is meaningless in a master's fault-less execution too
+        // The full meaning of this parameter is explained in "broadcastListener slave dequeue" sequence diagram.
+        // A big value will increase duplicates in case of master's fault or a small value will increase the risk of losing a message.
+        // The value is expressed in milliseconds.
+        public int maxExpectedMessageDelay;
+        //todo: non devono esserci campi non public, non vengono serializzati
 
 
         [JsonConstructor] public StartupArgJson() { }
@@ -63,33 +70,43 @@ namespace broadcastListener{
             catch (Exception e) { MessageBox.Show("Input JSON format should be like this: " + new StartupArgJson().ToString() + Environment.NewLine + "Found instead:" + s + Environment.NewLine + "Exception:" + e.ToString()); }
             return json;
         }
+        public bool Validate(bool terminateIfInvalid) {
+            string errors = FindErrors();
+            if (noErrorsResponse == errors) { return true; }
+            else {
+                if (terminateIfInvalid) { Program.pex(errors); }
+                else Program.pe(errors);
+                return false;
+            }
+        }
+        internal string FindErrors() {
+            if (criticalErrFile != null) try { Path.GetFullPath(this.criticalErrFile); } catch (Exception e) { return "criticalErrFile must either be null or a valid path" + e.ToString(); ; }
+            if (errFile != null) try { Path.GetFullPath(this.errFile); } catch (Exception e) { return "errFile must either be null or a valid path"+e; }
+            if (toolMsgFile != null) try { Path.GetFullPath(this.toolMsgFile); } catch (Exception e) { return "ToolMsgFile must either be null or a valid path"+e; }
+            if (slaveMsgFile != null) try { Path.GetFullPath(this.slaveMsgFile); } catch (Exception e) { return "SlaveMsgFile must either be null or a valid path"+e; }
+            if (logFile != null) try { Path.GetFullPath(this.logFile); } catch (Exception e) { return "logFile must either be null or a valid path"+e; }
+            if (toolMsgFile != null) try { Path.GetFullPath(this.toolMsgFile); } catch (Exception e) { return "ToolMsgFile must either be null or a valid path"+e; }
+            if (exclusiveBind && (toolReceiverThreads > 1 || slaveReceiverThreads > 1)) return "You can't request exclusive socket bind with multiple receiver threads";
 
-        internal bool Validate() {
             //if (this.benchmark && !this.enableGUI && this.logFile == null) { MessageBox.Show(""); }
-            if (myPartitionNumber >= partitionNumbers_Total) { MessageBox.Show("PartitionNumbers_Total must be the number of partitions made. Since partition numbers starts from zero it cannot be equal or less to a partition number."); return false; };
-            if (partitionNumbers_Total <= 0) { MessageBox.Show("PartitionNumbers_Total must be the number of partitions made. Therefore it cannot be less than one."); return false; };
+            if (myPartitionNumber >= partitionNumbers_Total) { return "PartitionNumbers_Total must be the number of partitions made. Since partition numbers starts from zero it cannot be equal or less to a partition number."; }
+            if (partitionNumbers_Total <= 0) { return "PartitionNumbers_Total must be the number of partitions made. Therefore it cannot be less than one."; }
             //if (replicationDegree <= 0) { MessageBox.Show("replicationDegree must be the number of backup-slaves running in case of failure for fault tolerance. It cannot be a negative number."); return false; };
             //it's logical, not physical! it is the maximum number of thread executable simultaneously.
-            if (toolReceiverThreads < 0) toolReceiverThreads = (int)Math.Ceiling(Environment.ProcessorCount / 2.0);
-            if (slaveReceiverThreads < 0) slaveReceiverThreads = (int)Math.Floor(Environment.ProcessorCount / 2.0);
+            if (toolReceiverThreads <= 0) toolReceiverThreads = (int)Math.Ceiling(Environment.ProcessorCount / 2.0);
+            if (slaveReceiverThreads <= 0) slaveReceiverThreads = (int)Math.Floor(Environment.ProcessorCount / 2.0);
             System.Net.IPAddress tmp;
-            if (!System.Net.IPAddress.TryParse(this.broadcastAddress, out tmp)) Program.pex("broadcastAddress must be a valid IP string");
-            if (this.partitionNumbers_Total > 1 && this.broadcastPort_Slaves == this.broadcastPort_Tool) Program.pex("port of tool broadcasting and intra-communication broadcasting can be equal only if there is a single partition (no partition)");
-            if (slaveNotifyMode_Batch < 0) { Program.pex("slaveNotifyMode_Batch must be at least zero to be valid, and equal to 0 or greater than 1 to make sense. Read the documentation."); return false; }
+            if (!System.Net.IPAddress.TryParse(this.broadcastAddress, out tmp)) return "broadcastAddress must be a valid IP string";
+            if (this.partitionNumbers_Total > 1 && this.broadcastPort_Slaves == this.broadcastPort_Tool) return "port of tool broadcasting and intra-communication broadcasting can be equal only if there is a single partition (no partition)";
+            if (slaveNotifyMode_Batch < 0) { return "slaveNotifyMode_Batch must be at least zero to be valid, and equal to 0 or greater than 1 to make sense. Read the documentation."; }
+            if (this.maxExpectedMessageDelay < 0) return "maxExpectedMessageDelay cannot be a negative value. fill instead with any positive number of milliseconds.";
 
-            if (toolMsgFile != null) try { Path.GetFullPath(this.toolMsgFile); } catch (Exception e) { Program.pex("ToolMsgFile must either be null or a valid path", e); }
-            if (slaveMsgFile != null) try { Path.GetFullPath(this.slaveMsgFile); } catch (Exception e) { Program.pex("SlaveMsgFile must either be null or a valid path", e); }
-            if (logFile != null) try { Path.GetFullPath(this.logFile); } catch (Exception e) { Program.pex("logFile must either be null or a valid path", e); }
-            if (errFile != null) try { Path.GetFullPath(this.errFile); } catch (Exception e) { Program.pex("errFile must either be null or a valid path", e); }
-            if (criticalErrFile != null) try { Path.GetFullPath(this.criticalErrFile); } catch (Exception e) { Program.pex("criticalErrFile must either be null or a valid path", e); }
-            if (toolMsgFile != null) try { Path.GetFullPath(this.toolMsgFile); } catch (Exception e) { Program.pex("ToolMsgFile must either be null or a valid path", e); }
-            if (exclusiveBind && (toolReceiverThreads > 1 || slaveReceiverThreads > 1)) Program.pex("You can't request exclusive socket bind with multiple receiver threads");
 
             foreach (Slave s in this.replicatorsList){
                 //check done in slave.coInitializer();
 
             }
-            return true;
+            return noErrorsResponse;
         }
         public static string[] fakeinput() {
             string desktop = Environment.GetFolderPath(System.Environment.SpecialFolder.DesktopDirectory);
@@ -115,6 +132,7 @@ namespace broadcastListener{
                 KafkaNodes = "http://"+kafkaHost+":9093, http://"+kafkaHost+":9094, http://"+kafkaHost+":9095",
                 KafkaTopic = "toolsEvents",
                 benchmark = true,
+                maxExpectedMessageDelay = 1000,
             };
             json.slaveNotifyMode_Batch = 100;
             json.dinamicallyStarted = false;
