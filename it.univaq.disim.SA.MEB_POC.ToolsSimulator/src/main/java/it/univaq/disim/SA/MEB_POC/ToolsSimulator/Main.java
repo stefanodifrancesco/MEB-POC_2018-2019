@@ -10,7 +10,6 @@ import org.apache.commons.lang3.time.StopWatch;
 
 public class Main {
 
-	@SuppressWarnings("deprecation")
 	public static void main(String[] args) {
 		
 		/*List<String> recipes = Utilities.Generate_Recipe(100, "C:\\Users\\Stefano\\Desktop\\kafka_2.12-2.1.0\\", "RecipeList.txt");
@@ -25,8 +24,9 @@ public class Main {
 		List<ToolThread> tools = new ArrayList<ToolThread>();
 		StopWatch sw = new StopWatch();
 		
+		int dummyCounter = 0;
+		
 		for (int i = 0; i < equipOIDs.size(); i++) {
-		//for (int i = 0; i < 5; i++) {
 			String equipOID = equipOIDs.get(i);
 			String category = equipOID.substring(equipOID.length() - 4);
 
@@ -45,29 +45,25 @@ public class Main {
 			tool.start();
 		}
 		sw.start();
-		System.out.println("400 tools started sending messages...");
+		System.out.println(equipOIDs.size() + " tools started sending messages...");
 
 		while (true) {
-			 
+			
+			if ( dummyCounter == 12) {
+				System.out.println("After " + (sw.getTime(TimeUnit.SECONDS) / 60) + " minutes");
+				dummyCounter = 0;
+			}
 			System.out.println("messages sent: HoldON  " + holdONCounter.getValue());
 			System.out.println("messages sent: HoldOFF " + holdOFFCounter.getValue());
 			System.out.println("messages sent: Total   " + (holdONCounter.getValue() + holdOFFCounter.getValue()));
+			System.out.println("");
+			dummyCounter++;
 
 			try {
-				Thread.sleep(10000);
+				Thread.sleep(5000);
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
-			}
-			
-			if (sw.getTime(TimeUnit.MINUTES) > 3) {
-				for (ToolThread tool : tools) {
-					tool.stop();
-				}
-				System.out.println("messages sent: HoldON  " + holdONCounter.getValue());
-				System.out.println("messages sent: HoldOFF " + holdOFFCounter.getValue());
-				System.out.println("messages sent: Total   " + (holdONCounter.getValue() + holdOFFCounter.getValue()));
-				return;
 			}
 			
 		}

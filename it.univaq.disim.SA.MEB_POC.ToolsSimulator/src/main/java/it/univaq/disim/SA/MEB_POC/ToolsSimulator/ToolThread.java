@@ -36,12 +36,12 @@ public class ToolThread extends Thread {
 			InhibitEvent holdON = Utilities.Generate_Inhibit_Event(equipOID, recipeOID, noEquipProbability);
 
 			String messageON = Utilities.Inhibit_to_XML(holdON);
-
-			Utilities.broadcast(messageON);
 			holdONCounter.increment();
+			Utilities.broadcast(messageON);
+			
 
 			try {
-				Thread.sleep(new Random().nextInt(40000));
+				Thread.sleep(new Random().nextInt(30000));
 			} catch (InterruptedException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
@@ -50,9 +50,9 @@ public class ToolThread extends Thread {
 			InhibitEvent holdOFF = Utilities.Generate_Inverted_Inhibit(holdON);
 
 			String messageOFF = Utilities.Inhibit_to_XML(holdOFF);
-
-			Utilities.broadcast(messageOFF);
 			holdOFFCounter.increment();
+			Utilities.broadcast(messageOFF);
+			
 		}
 
 	}

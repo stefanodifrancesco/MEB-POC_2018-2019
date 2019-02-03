@@ -5,7 +5,6 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
@@ -85,7 +84,7 @@ public class Utilities {
 		inserted.setStep_OID(new Generatore_OID().GenerateStepId(equipOID.substring(equipOID.length() - 4)));
 		del.setStep_OID(inserted.getStep_OID());
 
-		inserted.setHold_type("ProcessEquipHold_" + new Random().nextInt(50));
+		inserted.setHold_type("HoldTypeId" + new Random().nextInt(100));
 		del.setHold_type(inserted.getHold_type());
 
 		inserted.setHold_flag("Y");
