@@ -5,7 +5,7 @@
 	<meta name="viewport" content="width=device-width, initial-scale=1">
     <title>MEB-POC Dashboard</title>
 	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
-    <meta http-equiv="refresh" content="5" >
+    <meta http-equiv="refresh" content="10" >
 </head>
 <?php
 	$servername = "localhost";
@@ -24,6 +24,13 @@
 					$row = $dbh->query('SELECT COUNT(*) FROM analytics_database.aggregateddata WHERE (TIMESTAMPDIFF(MINUTE, HoldEndDateTime, NOW()) <= 30)')->fetch();
 					echo "<h4>" . $row['COUNT(*)'] . " messages stored, in the last 30 minutes</h4>";
 					?>
+			</div>
+			<div class="col-md-6">
+				<form action="/customQuery.php" method="post">
+					<br>
+			        <input type="text" name="queryStr" size="75" placeholder="Run a custom query" required="true">
+			        <input type="submit" value="Submit" align="right" >
+        		</form>
 			</div>			
 		</div>
 		<div class="row">
