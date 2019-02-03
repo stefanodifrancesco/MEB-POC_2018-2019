@@ -160,5 +160,6 @@ mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
 mysqlcluster.user: root
 mysqlcluster.password: root
 ```
+> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
 ## Running report tool<a name="running"></a>
 The *Report tool* folder contains a .php file to be runned on a server.
