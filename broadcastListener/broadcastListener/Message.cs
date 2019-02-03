@@ -157,7 +157,7 @@ namespace broadcastListener
             string[] tokens = key.Split(myMessage.keySeparator);
             if (tokens == null || tokens.Length < 6) { Program.pe("MakeKafkaKey error! key:"+key); return key; };//return null;
             const int equip = 0, recipe = 1, step = 2, holdtype = 3, holdflag = 4, timestamp = 5;
-            return tokens[equip] + myMessage.keySeparator + tokens[recipe] + myMessage.keySeparator + tokens[holdtype]; }
+            return tokens[equip] + myMessage.keySeparator + tokens[recipe] + myMessage.keySeparator + tokens[step] + myMessage.keySeparator + tokens[holdtype]; }
 
         public myMessage(MessageType type_forOutputMessages, string data) {
             this.key = null;
