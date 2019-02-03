@@ -148,6 +148,15 @@ shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone.properti
 shell> cd Release\KafkaStream_Instance1
 shell> java -cp StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
 ```
-
+###### Each instance folder contains also a configuration file:
+#### config.properties
+```
+inputtopic: toolsEvents
+outputtopic: aggregateddata
+servers: localhost:9093,localhost:9094,localhost:9095
+mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
+mysqlcluster.user: root
+mysqlcluster.password: root
+```
 ## Running report tool<a name="running"></a>
 The *Report tool* folder contains a .php file to be runned on a server.
