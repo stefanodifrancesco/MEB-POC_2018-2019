@@ -67,7 +67,7 @@ for($i=0; true; $i++){
         foreach ($row as $columnName => $val) { $row_str.="<th>$columnName</th>"; }
         $row_str.="</tr>";
     }
-    $row_str.="<tr><th>$i)</th>";
+    $row_str.="<tr><th>($i+1))</th>";
     foreach ($row as $columnName => $val) { $row_str.="<td>$val</td>"; }
     $row_str.="</tr>";
 }
