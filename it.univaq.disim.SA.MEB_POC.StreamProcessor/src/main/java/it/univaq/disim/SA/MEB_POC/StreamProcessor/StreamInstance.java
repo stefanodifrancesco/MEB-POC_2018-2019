@@ -39,8 +39,8 @@ public class StreamInstance {
 
 	static Connection rawdataConn = null;
 	static PreparedStatement rawdataPrepareStat = null;
-	static int holdONCounter;
-	static int holdOFFCounter;
+	/*static int holdONCounter;
+	static int holdOFFCounter;*/
 	static int publishedCounter;
 
 	static void runStream() {
@@ -70,8 +70,8 @@ public class StreamInstance {
 			public boolean test(String key, String value) {
 				InhibitEvent event = JAXB.unmarshal(new StringReader(value), InhibitEvent.class);
 				if (event.getInserted().getHold_flag().equals("Y")) {
-					holdONCounter += 1;
-					System.out.println("holdON arrived: " + holdONCounter);
+					/*holdONCounter += 1;
+					System.out.println("holdON arrived: " + holdONCounter);*/
 
 					return true;
 				} else {
@@ -89,9 +89,9 @@ public class StreamInstance {
 			public boolean test(String key, String value) {
 				InhibitEvent event = JAXB.unmarshal(new StringReader(value), InhibitEvent.class);
 				if (event.getInserted().getHold_flag().equals("N")) {
-					holdOFFCounter += 1;
+					/*holdOFFCounter += 1;
 					System.out.println("holdOFF arrived: " + holdOFFCounter);
-
+*/
 					return true;
 				} else {
 					return false;
