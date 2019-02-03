@@ -3,11 +3,9 @@
 <head>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>example-aggregate-functions-and-grouping-count-with-group-by- php mysql examples | w3resource</title>
-    <meta name="description" content="example-aggregate-functions-and-grouping-count-with-group-by- php mysql examples | w3resource">
+    <title>MEB-POC Dashboard - custom query</title>
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.5/css/bootstrap.min.css">
 </head>
-<meta http-equiv="refresh" content="5" >
 <body style="background-color: powderblue">
 <?php
 function FetchRow_CustomAssociate($statement, $metadata_arr){
