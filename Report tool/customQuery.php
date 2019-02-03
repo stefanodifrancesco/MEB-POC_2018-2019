@@ -33,12 +33,12 @@ function FetchRow_CustomAssociate($statement, $metadata_arr){
         $row[$TableAndColumn] = $v;}
 
     return [$row, $metadata_arr];}
-var_dump($_POST);
+//var_dump($_POST);
 if(isset($_POST['queryStr'])) $sql = $_POST['queryStr']; else {
     echo
         '<form action="/customQuery.php" method="post">'.
             'Query:<br>'.
-            '<input type="text" name="queryStr" value="SELECT COUNT(*) FROM analytics_database.aggregateddata WHERE (TIMESTAMPDIFF(MINUTE, HoldEndDateTime, NOW()) <= 30)">'.
+            '<input style="width:calc(100vw - 16px)" type="text" name="queryStr" value="SELECT COUNT(*) FROM analytics_database.aggregateddata WHERE (TIMESTAMPDIFF(MINUTE, HoldEndDateTime, NOW()) <= 30)">'.
             '<br><br>'.
             '<input type="submit" value="Submit">'.
         '</form>';
