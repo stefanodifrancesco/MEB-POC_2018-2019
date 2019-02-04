@@ -43,7 +43,7 @@ shell> mkdir my_cluster my_cluster\ndb_data my_cluster\mysqld_data my_cluster\co
 Create two file in the *conf* folder:
 > NOTE: Change **YOUR_PATH** to point the directories just created
 
-#### my.cnf
+###### my.cnf
 ```
 [mysqld]
 ndbcluster
@@ -51,7 +51,7 @@ datadir=C:\\YOUR_PATH\\mysqlc\\my_cluster\\mysqld_data
 basedir=C:\\YOUR_PATH\\mysqlc
 port=5000
 ```
-#### config.ini
+###### config.ini
 ```
 [ndb_mgmd]
 # Management process options:
@@ -148,9 +148,12 @@ shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone2.propert
 shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone3.properties .\config\sink-connect-jdbc.properties
 ```
 
-> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
+> NOTE: The file *sink-connect-jdbc.properties* contains the name of the output topic that must be equal to the name of the corresponding table on analytics database, and the parameters for the connection to MySQL Cluster
+
 ## Running <a name="running"></a>
+
 ### Kafka Stream <a name="stream"></a>
+
 #### Start Kafka Stream processors
 ###### There are three Kafka Stream instances in the Release folder, you can run all of them to improve scalability
 ```
@@ -158,7 +161,7 @@ shell> cd Release\KafkaStream_Instance1
 shell> java -cp StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
 ```
 ###### Each instance folder contains also a configuration file:
-#### config.properties
+###### config.properties
 ```
 inputtopic: toolsEvents
 outputtopic: aggregateddata
@@ -167,12 +170,16 @@ mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
 mysqlcluster.user: root
 mysqlcluster.password: root
 ```
+> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
+
 ### Broadcast listener <a name="broadcast"></a>
 From the folder *Release\BroadcastListener* of your local repository start two instances of the listener using the scripts  *BroadcastListener launcher - 1 of 2.bat* and *BroadcastListener launcher - 2 of 2.bat*
+
 ### Tools simulator <a name="simulator"></a>
 Open a shell in the folder *Release\ToolsSimulator* and give the following command:
 ```
 shell> java -cp .\ToolsSimulator-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.ToolsSimulator.Main
 ```
+
 ### Report tool <a name="report"></a>
 The *Report tool* folder contains a .php file to be runned on a server.
