@@ -16,7 +16,6 @@ namespace broadcastListener{
         public bool enablePrintSlave = false, enablePrintTool = false, enablePrintStatus = true;
         public List<Slave> replicatorsList;
         public int myPartitionNumber, partitionNumbers_Total;
-        //$ a value less than 1 will set the values equal to half of machine logic processors / 2 for each (rounded up).
         public int toolReceiverThreads, slaveReceiverThreads;
         // of your network
         public string broadcastAddress;
@@ -45,8 +44,7 @@ namespace broadcastListener{
         public string KafkaTopic;
         //enables test mode and display performance statistics.
         public bool benchmark;
-
-        //$todo: aggiungi alla wiki
+        
         // if master's slaveNotifyMode_Batch = false, this is meaningless, this is meaningless in a master's fault-less execution too
         // The full meaning of this parameter is explained in "broadcastListener slave dequeue" sequence diagram.
         // A big value will increase duplicates in case of master's fault or a small value will increase the risk of losing a message.

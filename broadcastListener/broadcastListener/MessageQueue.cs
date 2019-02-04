@@ -21,7 +21,7 @@ namespace broadcastListener
             TimeIntPair pair = (TimeIntPair)obj;
             return t.CompareTo(pair.t); }
     }*/
-    public interface MessageQueueI {//todo: potrebbe diventare iMessageQueue<T> con T = TimedWithKeyInterface applicata a messageType per prendere timestamp e key con funzioni/proprietà.
+    public interface MessageQueueI {
         myMessage Add(myMessage m);
         myMessage get(string key, bool remove = false);
         myMessage getOldest(bool remove = false);
@@ -62,7 +62,7 @@ namespace broadcastListener
             lock (this) {
                 if (this.msgBymsgKey.ContainsKey(m.key)) {
                     Program.pe("duplicate detected and discarded.");
-                    return null; }//todo: non dovrebbe succedere mai nell'esecuzione normale, ma forse dovrei usare una collezione che supporti i duplicati
+                    return null; }
                 //int q = this.queue.Count, ke = this.msgBymsgKey.Count;
                 //if ( this.queue.Count != this.msgBymsgKey.Count) { Program.pe("error before insert element in queue. Q:" + this.queue.Count + this.msgBymsgKey.Count); }
                 this.msgBymsgKey.Add(m.key, m);
@@ -116,7 +116,6 @@ namespace broadcastListener
                 top.arrivalTime = t;
                 ICollection<myMessage> ret = this.queue.GetViewBetween(bot, top);
                 if (ret == null) return new List<myMessage>(0);
-                //todo:_ siccome alla queue può accederci solo uno per volta, fai una copia cache per il sender.
                 if (remove) foreach (myMessage m in ret) ((MessageQueueI)this).get(m.key, true);
                 return ret; } }
 
@@ -153,8 +152,7 @@ namespace broadcastListener
         // get and remove by msgkey (or by msg)
         // get and remove older than time
         public myMessage Add(myMessage m) {
-            //todo: write in document: assumption made: non possono esistere 2 messaggi identici (stesso equip, recipe, step, holdtype, holdflag, timestamp
-            //se capitano io butto i duplicati successivi, mi serve una key univoca.
+           //se capitano io butto i duplicati successivi, mi serve una key univoca.
             lock (this) {
                 //indexByTime0.Add(m.timestamp, queue.Count);
                 try { indexByMsgKey.Add(m.key, queue.Count); } catch (System.ArgumentException e) { return null; }
@@ -162,13 +160,12 @@ namespace broadcastListener
                 queue.Add(m); }
             return m; }
         public myMessage get(string messageKey) {
-            lock (this) { //todo$ cerca se lock usa la var come semaforo vero e proprio garantendo la sicurezza anche dei campi oppure no.
+            lock (this) { 
                 int index;
                 if (!indexByMsgKey.TryGetValue(messageKey, out index)) return null;
                 return queue[index]; }
         }
-        //todo: sta cosa del timestamp non può funzionare, a meno che io non usi il timestamp contenuto nel messaggio. perchè sennò potrei avere una coda grossa su uno e generare un timestamp molto maggiore del tempo di arrivo del messaggio nel buffer.
-        /*public List<myMessage> getPrevious0(DateTime t){
+       /*public List<myMessage> getPrevious0(DateTime t){
             //var indexByTime0 = new TreeDictionary<DateTime, int>();//useless
             lock (this) {
                 int index;
@@ -193,12 +190,11 @@ namespace broadcastListener
             // if(includeEqual)                ^      
             // else            ^                      
 
-            TimeIntPair original = new TimeIntPair(tt, int.MinValue);//todo: includi anche int nell'ordinamento
+            TimeIntPair original = new TimeIntPair(tt, int.MinValue);
             lock (this) {
                 TimeIntPair current , next, prev;
                 //get previous startpoint (might be equal)
                 if(!indexByMsgTime.TryPredecessor(original, out current)){
-                    //todo:
                     throw new Exception ("sei sicuro che non esista un elemento più piccolo? non è che ti da false semplicemente perchè tt non è inserito nella collezione?");
                     if (indexByMsgTime.Count == 0) return null;
                     else current = indexByMsgTime.First(); }
