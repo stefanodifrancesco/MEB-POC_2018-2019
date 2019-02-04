@@ -168,11 +168,11 @@ mysqlcluster.user: root
 mysqlcluster.password: root
 ```
 ### Broadcast listener <a name="broadcast"></a>
-From the folder \Release\BroadcastListener of your local repository start two instances of the listener using the scripts  BroadcastListener launcher - 1 of 2.bat and BroadcastListener launcher - 2 of 2.bat
+From the folder *Release\BroadcastListener* of your local repository start two instances of the listener using the scripts  *BroadcastListener launcher - 1 of 2.bat* and *BroadcastListener launcher - 2 of 2.bat*
 ### Tools simulator <a name="simulator"></a>
-Open a shell in the folder \Release\ToolsSimulator and give the following command:
+Open a shell in the folder *Release\ToolsSimulator* and give the following command:
 ```
 shell> java -cp .\ToolsSimulator-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.ToolsSimulator.Main
 ```
-### Report tool <a name="report"></>
+### Report tool <a name="report"></a>
 The *Report tool* folder contains a .php file to be runned on a server.
