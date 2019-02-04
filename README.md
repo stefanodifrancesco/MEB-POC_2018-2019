@@ -12,7 +12,7 @@
     4. [Report tool](#report)
 
 ## Introduction <a name="introduction"></a>
-The ToolsSimulator will simulate 400 tools broadcasting 80000 XML messages in 30 minutes. Half of them contains the start time of an holding operation, the other half contains the end time. Every message brings the tool OID, the recipe OID and the type of hold.
+The ToolsSimulator will simulate 800 tools broadcasting 150000 XML messages in 30 minutes. Half of them contains the start time of an holding operation, the other half contains the end time. Every message brings the tool OID, the recipe OID and the type of hold.
 The broadcast listener will intercept all this messages and publish them on the topic 'toolsEvents' of Kafka.   
 The StreamProcessor will aggregate them retrieving common names of tools and recipes from 'raw_data' database stored in MySQL Cluster.  
 It will also join start and end times to create a single aggregated messaged republished on the 'aggregateddata' topic.  
