@@ -130,11 +130,10 @@ shell> .\bin\windows\kafka-server-start.bat .\config\server.1.properties
 shell> .\bin\windows\kafka-server-start.bat .\config\server.2.properties
 shell> .\bin\windows\kafka-server-start.bat .\config\server.3.properties
 ```
-#### Create three topics
+#### Create the input and output topics
 
 ```
 shell> .\bin\windows\kafka-topics.bat --create --topic toolsEvents --zookeeper localhost:2181 --partitions 3 --replication-factor 2
-shell> .\bin\windows\kafka-topics.bat --create --topic globalTableHoldON --zookeeper localhost:2181 --partitions 3 --replication-factor 2
 shell> .\bin\windows\kafka-topics.bat --create --topic aggregateddata --zookeeper localhost:2181 --partitions 3 --replication-factor 2
 ```
 #### Start one or more instances of the JDBC Sink Connector plugin
