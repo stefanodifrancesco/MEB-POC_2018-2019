@@ -12,6 +12,7 @@ public class Main {
 
 	public static void main(String[] args) {
 		
+		// The following two lines are useful to generate txt files with lists of OIDs
 		/*List<String> recipes = Utilities.Generate_Recipe(100, "C:\\Users\\Stefano\\Desktop\\kafka_2.12-2.1.0\\", "RecipeList.txt");
 		Utilities.Generate_Equip(recipes, 4, "C:\\Users\\Stefano\\Desktop\\kafka_2.12-2.1.0\\", "EquipList.txt");*/
 
