@@ -5,7 +5,11 @@
 2. [Instructions](#instructions)
     1. [MySQL Cluster](#mysql)
     2. [Kafka](#kafka)
-3. [Running report tool](#running)
+3. [Running](#running)
+    1. [Kafka Stream](#stream)
+    2. [Broadcast listener](#broadcast)
+    3. [Tools simulator](#simulator)
+    4. [Report tool](#report)
 
 ## Introduction <a name="introduction"></a>
 The ToolsSimulator will simulate 400 tools broadcasting 80000 XML messages in 30 minutes. Half of them contains the start time of an holding operation, the other half contains the end time. Every message brings the tool OID, the recipe OID and the type of hold.
@@ -143,6 +147,10 @@ shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone1.propert
 shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone2.properties .\config\sink-connect-jdbc.properties
 shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone3.properties .\config\sink-connect-jdbc.properties
 ```
+
+> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
+## Running <a name="running"></a>
+### Kafka Stream <a name="stream"></a>
 #### Start Kafka Stream processors
 ###### There are three Kafka Stream instances in the Release folder, you can run all of them to improve scalability
 ```
@@ -159,6 +167,12 @@ mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
 mysqlcluster.user: root
 mysqlcluster.password: root
 ```
-> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
-## Running report tool<a name="running"></a>
+### Broadcast listener <a name="broadcast"></a>
+From the folder \Release\BroadcastListener of your local repository start two instances of the listener using the scripts  BroadcastListener launcher - 1 of 2.bat and BroadcastListener launcher - 2 of 2.bat
+### Tools simulator <a name="simulator"></a>
+Open a shell in the folder \Release\ToolsSimulator and give the following command:
+```
+shell> java -cp .\ToolsSimulator-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.ToolsSimulator.Main
+```
+### Report tool <a name="report"></>
 The *Report tool* folder contains a .php file to be runned on a server.
