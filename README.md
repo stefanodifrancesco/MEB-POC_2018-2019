@@ -297,7 +297,10 @@ mysqlcluster.password: root
 > NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
 
 ### Broadcast listener <a name="broadcastListener2"></a>
+#### Prerequisites:
+All required dynamical linking libraries are already in place, .Net Framework 4.7 or higher is required on hosting machine.
 
+#### Launch:
 There are 2 pre-made batch file with for one-click running 2 master instances with different parameters that are splitting the load in 2 partition in the folder *Release\BroadcastListener*. You can either start those two instances of the listener using the scripts  *BroadcastListener launcher - 1 of 2.bat* and *BroadcastListener launcher - 2 of 2.bat* or run it multiple times with customized parameters.
 
 ### Tools simulator <a name="simulator"></a>
