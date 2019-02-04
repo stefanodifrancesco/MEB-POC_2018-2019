@@ -5,10 +5,10 @@
 2. [Instructions](#instructions)
     1. [MySQL Cluster](#mysql)
     2. [Kafka](#kafka)
-    2. [BroadcastListener](#broadcastListener)
+    2. [BroadcastListener](#broadcastListener1)
 3. [Running](#running)
     1. [Kafka Stream](#stream)
-    2. [Broadcast listener](#broadcast)
+    2. [Broadcast listener](#broadcastListener2)
     3. [Tools simulator](#simulator)
     4. [Report tool](#report)
 
@@ -151,29 +151,9 @@ shell> .\bin\windows\connect-standalone.bat .\config\connect-standalone3.propert
 
 > NOTE: The file *sink-connect-jdbc.properties* contains the name of the output topic that must be equal to the name of the corresponding table on analytics database, and the parameters for the connection to MySQL Cluster
 
-## Running <a name="running"></a>
 
-### Kafka Stream <a name="stream"></a>
+### BroadcastListener<a name="BroadcastListener1"></a>
 
-#### Start Kafka Stream processors
-###### There are three Kafka Stream instances in the Release folder, you can run all of them to improve scalability
-```
-shell> cd Release\KafkaStream_Instance1
-shell> java -cp StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
-```
-###### Each instance folder contains also a configuration file:
-###### config.properties
-```
-inputtopic: toolsEvents
-outputtopic: aggregateddata
-servers: localhost:9093,localhost:9094,localhost:9095
-mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
-mysqlcluster.user: root
-mysqlcluster.password: root
-```
-> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
-
-### Broadcast listener <a name="broadcastListener"></a>
 This software accept a single command line argument containing a string-encoded JSON with all parameters.
 This software can run in 2 different mode: Master and Slave (replica).
 The master instances of this program are one doing all the required operation.
@@ -293,6 +273,30 @@ The value is expressed in milliseconds.
 Default arguments suggested for my machine (partly automatically generated):
 
 `{"broadcastPort_Tool":20001,"broadcastPort_Slaves":20002,"enableGUI":true,"replicatorsList":[{"ip_string":"192.168.1.100","id":8796095578122,"isSelf":true},{"ip_string":"192.168.1.101","id":8796095578123,"isSelf":false},{"ip_string":"192.168.1.102","id":8796095578124,"isSelf":false}],"myPartitionNumber":0,"partitionNumbers_Total":1,"toolReceiverThreads":2,"slaveReceiverThreads":2,"broadcastAddress":"192.168.1.255","logFile":"C:\\Users\\diama\\Desktop\\Listener_EventLog.txt","errFile":"C:\\Users\\diama\\Desktop\\Listener_Errors.txt","criticalErrFile":"C:\\Users\\diama\\Desktop\\Listener_CriticalErrors.txt","toolMsgFile":"C:\\Users\\diama\\Desktop\\Listener_ToolLog.txt","slaveMsgFile":"C:\\Users\\diama\\Desktop\\Listener_SlaveLog.txt","slaveNotifyMode_Batch":100,"dinamicallyStarted":false,"logToolMsgOnReceive":false,"exclusiveBind":false,"KafkaNodes":"http://localhost:9093, http://localhost:9094, http://localhost:9094","KafkaTopic":"toolsEvents","benchmark":true}`
+
+## Running <a name="running"></a>
+
+### Kafka Stream <a name="stream"></a>
+
+#### Start Kafka Stream processors
+###### There are three Kafka Stream instances in the Release folder, you can run all of them to improve scalability
+```
+shell> cd Release\KafkaStream_Instance1
+shell> java -cp StreamProcessor-0.0.1-SNAPSHOT-jar-with-dependencies.jar it.univaq.disim.SA.MEB_POC.StreamProcessor.Main
+```
+###### Each instance folder contains also a configuration file:
+###### config.properties
+```
+inputtopic: toolsEvents
+outputtopic: aggregateddata
+servers: localhost:9093,localhost:9094,localhost:9095
+mysqlcluster.url: jdbc:mysql://localhost:5000/raw_data?serverTimezone=UTC
+mysqlcluster.user: root
+mysqlcluster.password: root
+```
+> NOTE: Pay attention to the output topic name that must be equal to the name of the corresponding table on analytics database
+
+### Broadcast listener <a name="broadcastListener2"></a>
 
 There are 2 pre-made batch file with for one-click running 2 master instances with different parameters that are splitting the load in 2 partition in the folder *Release\BroadcastListener*. You can either start those two instances of the listener using the scripts  *BroadcastListener launcher - 1 of 2.bat* and *BroadcastListener launcher - 2 of 2.bat* or run it multiple times with customized parameters.
 
